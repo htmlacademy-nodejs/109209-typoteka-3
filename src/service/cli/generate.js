@@ -7,6 +7,7 @@ const {
 } = require(`../../utils`);
 const fs = require(`fs`);
 const chalk = require(`chalk`);
+const {promisify} = require(`util`);
 
 const DEFAULT_COUNT = 1;
 const FILE_NAME = `mocks.json`;
@@ -86,7 +87,7 @@ const generatePublications = (count) => (
 
 module.exports = {
   name: `--generate`,
-  run(args) {
+  async run(args) {
     const [count] = args;
     const countPublication = Number.parseInt(count, 10) || DEFAULT_COUNT;
 
@@ -95,13 +96,13 @@ module.exports = {
     }
 
     const content = JSON.stringify(generatePublications(countPublication));
+    const writeFile = promisify(fs.writeFile);
 
-    return fs.writeFile(FILE_NAME, content, (err) => {
-      if (err) {
-        return console.error(chalk.red(`Can't write data to file...`));
-      }
-
+    try {
+      await writeFile(FILE_NAME, content);
       return console.info(chalk.green(`Operation success. File created.`));
-    });
+    } catch (e) {
+      return console.error(chalk.red(`Can't write data to file...`));
+    }
   }
 };
