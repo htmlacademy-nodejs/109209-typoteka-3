@@ -1,4 +1,8 @@
 'use strict';
+const fs = require(`fs`);
+const path = require(`path`);
+const {promisify} = require(`util`);
+const chalk = require(`chalk`);
 
 module.exports.getRandomInt = (min, max) => {
   min = Math.ceil(min);
@@ -20,3 +24,15 @@ const addsZeroBeforeNumber = (number) => number < 10 ? `0${number}` : number;
 module.exports.formatDate = (date) =>
   `${date.getFullYear()}-${addsZeroBeforeNumber(date.getMonth() + 1)}-${addsZeroBeforeNumber(date.getDate())}` +
   `${addsZeroBeforeNumber(date.getHours())}:${addsZeroBeforeNumber(date.getMinutes())}:${addsZeroBeforeNumber(date.getSeconds())}`;
+
+module.exports.getContent = async (name) => {
+  const readFile = promisify(fs.readFile);
+  const pathFile = path.join(`data`, `${name}.txt`);
+
+  try {
+    const data = await readFile(pathFile, `utf8`);
+    return data.split(`\n`);
+  } catch (e) {
+    return console.error(chalk.red(e));
+  }
+};
