@@ -6,9 +6,8 @@ const {
   formatDate,
   getContent
 } = require(`../../utils`);
-const fs = require(`fs`);
+const fsPromises = require(`fs`).promises;
 const chalk = require(`chalk`);
-const {promisify} = require(`util`);
 
 const DEFAULT_COUNT = 1;
 const FILE_NAME = `mocks.json`;
@@ -50,11 +49,9 @@ module.exports = {
       return console.error(`Не больше 1000 публикаций`);
     }
 
-    const writeFile = promisify(fs.writeFile);
-
     try {
       const content = JSON.stringify(await generatePublications(countPublication));
-      await writeFile(FILE_NAME, content);
+      await fsPromises.writeFile(FILE_NAME, content);
       return console.info(chalk.green(`Operation success. File created.`));
     } catch (e) {
       return console.error(chalk.red(`Can't write data to file...`));

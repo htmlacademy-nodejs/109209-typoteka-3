@@ -1,7 +1,6 @@
 'use strict';
-const fs = require(`fs`);
+const fsPromises = require(`fs`).promises;
 const path = require(`path`);
-const {promisify} = require(`util`);
 const chalk = require(`chalk`);
 
 module.exports.getRandomInt = (min, max) => {
@@ -26,12 +25,11 @@ module.exports.formatDate = (date) =>
   `${addsZeroBeforeNumber(date.getHours())}:${addsZeroBeforeNumber(date.getMinutes())}:${addsZeroBeforeNumber(date.getSeconds())}`;
 
 module.exports.getContent = async (name) => {
-  const readFile = promisify(fs.readFile);
-  const pathFile = path.join(`data`, `${name}.txt`);
+  const pathFile = path.resolve(path.join(`data`, `${name}.txt`));
 
   try {
-    const data = await readFile(pathFile, `utf8`);
-    return data.split(`\n`);
+    const data = await fsPromises.readFile(pathFile, `utf8`);
+    return data.split(`\n`).filter((item) => item !== ``);
   } catch (e) {
     return console.error(chalk.red(e));
   }
